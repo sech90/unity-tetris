@@ -110,7 +110,7 @@ public class Grid {
 				return false;
 
 			//left-kick the minimum amount to keep the polymino in the grid
-			rot.Col -= rot.RightMost.x - Width;
+			rot.Col -= (rot.RightMost.x - Width)+1;
 		}
 
 		//check left
@@ -169,6 +169,9 @@ public class Grid {
 		//keeps track of how many times a given row should be moved down
 		int jump = 0;
 
+		//sort descending. Bottommost rows are the first
+		fullRows.Sort((int a, int b) =>{ return -a.CompareTo(b);});
+
 		//start from bottommost full row, then goes up to the top
 		for(int row = fullRows[0]; row >= 0; row--){
 
@@ -181,6 +184,10 @@ public class Grid {
 			//we're on a row with some blocks. move the row down
 			else if(_fullCellCount[row] > 0)
 				MoveRow(row, row+jump);
+
+			//no more blocks to inspect
+			else
+				break;
 		}
 	}
 
