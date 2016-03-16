@@ -7,15 +7,15 @@ public class TestPolymino {
 
 	class Coords{
 
-		public Coord[][] All{get{return new Coord[][]{I,T,L,J,S,Z,O};}}
+		public Cell[][] All{get{return new Cell[][]{I,T,L,J,S,Z,O};}}
 
-		public Coord[] I;
-		public Coord[] T;
-		public Coord[] L;
-		public Coord[] J;
-		public Coord[] S;
-		public Coord[] Z;
-		public Coord[] O;
+		public Cell[] I;
+		public Cell[] T;
+		public Cell[] L;
+		public Cell[] J;
+		public Cell[] S;
+		public Cell[] Z;
+		public Cell[] O;
 	}
 
 	private Polymino I,T,L,J,S,Z,O;
@@ -25,13 +25,13 @@ public class TestPolymino {
 
 	public TestPolymino(){
 		coords = new Coords();
-		coords.I = new Coord[]{new Coord(0,1), new Coord(1,1), new Coord(2,1), new Coord(3,1)};
-		coords.T = new Coord[]{new Coord(0,1), new Coord(1,1), new Coord(2,1), new Coord(1,0)};
-		coords.L = new Coord[]{new Coord(0,1), new Coord(1,1), new Coord(2,1), new Coord(2,0)};
-		coords.J = new Coord[]{new Coord(0,1), new Coord(1,1), new Coord(2,1), new Coord(0,0)};
-		coords.S = new Coord[]{new Coord(0,1), new Coord(1,1), new Coord(1,0), new Coord(2,0)};
-		coords.Z = new Coord[]{new Coord(0,0), new Coord(1,0), new Coord(1,1), new Coord(2,1)};
-		coords.O = new Coord[]{new Coord(0,0), new Coord(1,0), new Coord(1,1), new Coord(0,1)};
+		coords.I = new Cell[]{new Cell(0,1), new Cell(1,1), new Cell(2,1), new Cell(3,1)};
+		coords.T = new Cell[]{new Cell(0,1), new Cell(1,1), new Cell(2,1), new Cell(1,0)};
+		coords.L = new Cell[]{new Cell(0,1), new Cell(1,1), new Cell(2,1), new Cell(2,0)};
+		coords.J = new Cell[]{new Cell(0,1), new Cell(1,1), new Cell(2,1), new Cell(0,0)};
+		coords.S = new Cell[]{new Cell(0,1), new Cell(1,1), new Cell(1,0), new Cell(2,0)};
+		coords.Z = new Cell[]{new Cell(0,0), new Cell(1,0), new Cell(1,1), new Cell(2,1)};
+		coords.O = new Cell[]{new Cell(0,0), new Cell(1,0), new Cell(1,1), new Cell(0,1)};
 
 
 		I = new Polymino(coords.I);
@@ -80,28 +80,28 @@ public class TestPolymino {
 	[Test]
 	public void Rotation1() {
 		Polymino[] toTest = {new Polymino(coords.O), new Polymino(coords.T), new Polymino(coords.I)};
-		List<Coord[]>[] testRots = new List<Coord[]>[toTest.Length];
+		List<Cell[]>[] testRots = new List<Cell[]>[toTest.Length];
 
-		testRots[0] = new List<Coord[]>();
+		testRots[0] = new List<Cell[]>();
 		testRots[0].Add(coords.O);
 		testRots[0].Add(coords.O);
 		testRots[0].Add(coords.O);
 
-		testRots[1] = new List<Coord[]>();
-		testRots[1].Add(new Coord[]{new Coord(1,0), new Coord(1,1), new Coord(2,1), new Coord(1,2)});
-		testRots[1].Add(new Coord[]{new Coord(0,1), new Coord(1,1), new Coord(2,1), new Coord(1,2)});
-		testRots[1].Add(new Coord[]{new Coord(1,0), new Coord(1,1), new Coord(0,1), new Coord(1,2)});
+		testRots[1] = new List<Cell[]>();
+		testRots[1].Add(new Cell[]{new Cell(1,0), new Cell(1,1), new Cell(2,1), new Cell(1,2)});
+		testRots[1].Add(new Cell[]{new Cell(0,1), new Cell(1,1), new Cell(2,1), new Cell(1,2)});
+		testRots[1].Add(new Cell[]{new Cell(1,0), new Cell(1,1), new Cell(0,1), new Cell(1,2)});
 
-		testRots[2] = new List<Coord[]>();
-		testRots[2].Add(new Coord[]{new Coord(2,0), new Coord(2,1), new Coord(2,2), new Coord(2,3)});
-		testRots[2].Add(new Coord[]{new Coord(0,2), new Coord(1,2), new Coord(2,2), new Coord(3,2)});
-		testRots[2].Add(new Coord[]{new Coord(1,0), new Coord(1,1), new Coord(1,2), new Coord(1,3)});
+		testRots[2] = new List<Cell[]>();
+		testRots[2].Add(new Cell[]{new Cell(2,0), new Cell(2,1), new Cell(2,2), new Cell(2,3)});
+		testRots[2].Add(new Cell[]{new Cell(0,2), new Cell(1,2), new Cell(2,2), new Cell(3,2)});
+		testRots[2].Add(new Cell[]{new Cell(1,0), new Cell(1,1), new Cell(1,2), new Cell(1,3)});
 
 		for(int i=0; i< testRots.Length; i++){
 			Polymino p = toTest[i];
-			List<Coord[]> rotations = testRots[i];
+			List<Cell[]> rotations = testRots[i];
 
-			foreach(Coord[] rot in rotations){
+			foreach(Cell[] rot in rotations){
 				
 				//rotation clockwise must be correct
 				p.Rotate();
@@ -113,10 +113,10 @@ public class TestPolymino {
 	[Test]
 	public void Rotation2() {
 		foreach(Polymino p in All){
-			Coord[] initial = p.Body;
+			Cell[] initial = p.Body;
 
 			for(int i=0; i<4;i++){
-				Coord[] rotated = p.Rotated.Body;
+				Cell[] rotated = p.Rotated.Body;
 				p.Rotate();	
 
 				//rotation should be the same as rotated
@@ -135,10 +135,10 @@ public class TestPolymino {
 		i.Rotate();
 		t.Rotate();
 
-		Coord[] boundsO = new Coord[]{new Coord(1,1), new Coord(0,1)};
-		Coord[] boundsI = coords.I;
-		Coord[] boundsS = new Coord[]{new Coord(0,1), new Coord(1,1), new Coord(2,0)};
-		Coord[] boundsIrot = new Coord[]{new Coord(2,3)};
+		Cell[] boundsO = new Cell[]{new Cell(1,1), new Cell(0,1)};
+		Cell[] boundsI = coords.I;
+		Cell[] boundsS = new Cell[]{new Cell(0,1), new Cell(1,1), new Cell(2,0)};
+		Cell[] boundsIrot = new Cell[]{new Cell(2,3)};
 
 		//low bounds
 		Assert.That(O.GetLowerBounds(), Is.EquivalentTo(boundsO)); 
@@ -157,10 +157,10 @@ public class TestPolymino {
 	[Test]
 	public void RightBounds(){
 
-		Coord[] boundsO = new Coord[]{new Coord(1,0), new Coord(1,1)};
-		Coord[] boundsI = new Coord[]{new Coord(3,1)};
-		Coord[] boundsS = new Coord[]{new Coord(2,0), new Coord(1,1)};
-		Coord[] boundsT = new Coord[]{new Coord(1,0), new Coord(2,1)};
+		Cell[] boundsO = new Cell[]{new Cell(1,0), new Cell(1,1)};
+		Cell[] boundsI = new Cell[]{new Cell(3,1)};
+		Cell[] boundsS = new Cell[]{new Cell(2,0), new Cell(1,1)};
+		Cell[] boundsT = new Cell[]{new Cell(1,0), new Cell(2,1)};
 
 		//low bounds
 		Assert.That(O.GetRightBounds(), Is.EquivalentTo(boundsO)); 
@@ -177,10 +177,10 @@ public class TestPolymino {
 
 	[Test]
 	public void LeftBounds(){
-		Coord[] boundsO = new Coord[]{new Coord(0,0), new Coord(0,1)};
-		Coord[] boundsI = new Coord[]{new Coord(0,1)};
-		Coord[] boundsS = new Coord[]{new Coord(0,1), new Coord(1,0)};
-		Coord[] boundsT = new Coord[]{new Coord(0,1), new Coord(1,0)};
+		Cell[] boundsO = new Cell[]{new Cell(0,0), new Cell(0,1)};
+		Cell[] boundsI = new Cell[]{new Cell(0,1)};
+		Cell[] boundsS = new Cell[]{new Cell(0,1), new Cell(1,0)};
+		Cell[] boundsT = new Cell[]{new Cell(0,1), new Cell(1,0)};
 
 		//low bounds
 		Assert.That(O.GetLeftBounds(), Is.EquivalentTo(boundsO)); 
@@ -195,9 +195,9 @@ public class TestPolymino {
 		Assert.AreEqual(0,T.LeftMost.x);
 	}
 
-	private string PrintCoords(Coord[] coords){
+	private string PrintCoords(Cell[] coords){
 		string s = "";
-		foreach(Coord c in coords)
+		foreach(Cell c in coords)
 			s += c;
 
 		return s;

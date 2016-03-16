@@ -60,7 +60,7 @@ public class Grid {
 			return false;
 
 		//Check for overlapping blocks
-		Coord[] bounds = CurrentPiece.GetRightBounds();
+		Cell[] bounds = CurrentPiece.GetRightBounds();
 		for(int i=0; i<bounds.Length; i++){
 			bounds[i].x += 1;
 
@@ -80,7 +80,7 @@ public class Grid {
 			return false;
 
 		//Check for overlapping blocks
-		Coord[] bounds = CurrentPiece.GetLeftBounds();
+		Cell[] bounds = CurrentPiece.GetLeftBounds();
 		for(int i=0; i<bounds.Length; i++){
 			bounds[i].x -= 1;
 
@@ -139,7 +139,7 @@ public class Grid {
 	//O(n) where n is the polymino's body length
 	private List<int> AddPieceToBlocks(Polymino piece){
 		
-		Coord[] body = piece.Body;
+		Cell[] body = piece.Body;
 		List<int> fullRows = new List<int>();
 		int row, col;
 
@@ -210,7 +210,7 @@ public class Grid {
 	}
 
 	//O(coords.length)
-	private bool Overlaps(Coord[] coords){
+	private bool Overlaps(Cell[] coords){
 		for(int i=0; i<coords.Length; i++){
 			if(Contains(coords[i]))
 				return true;
@@ -219,7 +219,7 @@ public class Grid {
 	}
 
 	//O(1)
-	private bool Contains(Coord c){
+	private bool Contains(Cell c){
 		return _grid[c.y,c.x];
 	}
 }

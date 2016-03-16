@@ -21,26 +21,28 @@ public class Polymino {
 		}
 	}
 
-	public Coord BottomMost{get{return GetLowerBounds()[0];}}
-	public Coord LeftMost{get{return GetLeftBounds()[0];}}
-	public Coord RightMost{get{return GetRightBounds()[0];}}
-	public Coord[] Body{get{return GetBody();}}
+	public Cell BottomMost{get{return GetLowerBounds()[0];}}
+	public Cell LeftMost{get{return GetLeftBounds()[0];}}
+	public Cell RightMost{get{return GetRightBounds()[0];}}
+	public Cell[] Body{get{return GetBody();}}
+	public Cell[] OriginalBody{get{return (Cell[])_body.Clone();}}
 
-	private Coord[] _body;
-	private List<Coord> _lowerBounds;
-	private List<Coord> _leftBounds; 
-	private List<Coord> _rightBounds;   
+	private Cell[] _body;
+	private List<Cell> _lowerBounds;
+	private List<Cell> _leftBounds; 
+	private List<Cell> _rightBounds;   
 
-	public Polymino(Coord[] body) : this(body,PolyminoType.NONE,0,0){}
+	public Polymino(Cell[] body) : this(body,PolyminoType.NONE,0,0){}
 
-	public Polymino(Coord[] body, PolyminoType type) : this(body,type,0,0){}
+	public Polymino(Cell[] body, PolyminoType type) : this(body,type,0,0){}
 		
-	public Polymino(Coord[] body, PolyminoType type, int col, int row){
-		_body = (Coord[])body.Clone();
-		_lowerBounds = new List<Coord>(); 
-		_leftBounds = new List<Coord>();
-		_rightBounds = new List<Coord>(); 
+	public Polymino(Cell[] body, PolyminoType type, int col, int row){
+		_body = (Cell[])body.Clone();
+		_lowerBounds = new List<Cell>(); 
+		_leftBounds = new List<Cell>();
+		_rightBounds = new List<Cell>(); 
 
+		Type = type;
 		Row = row;
 		Col = col;
 		BoundSize = GetMaxCoordinate(_body) + 1;
@@ -54,8 +56,8 @@ public class Polymino {
 	}
 
 	//return a copy of the body translated to coordinates (Col, Row)
-	private Coord[] GetBody(){
-		Coord[] translatedBody = new Coord[_body.Length]; 
+	private Cell[] GetBody(){
+		Cell[] translatedBody = new Cell[_body.Length]; 
 		for(int i=0; i<translatedBody.Length; i++){
 			translatedBody[i].x = _body[i].x + Col;
 			translatedBody[i].y = _body[i].y + Row;
@@ -72,17 +74,17 @@ public class Polymino {
 		_rightBounds.Clear();
 	}
 		
-	public Coord[] GetLowerBounds(){
+	public Cell[] GetLowerBounds(){
 
 		//return cached
 		if(_lowerBounds.Count > 0)
 			return Translate(_lowerBounds.ToArray());
 
 		//sort array by x coordinate (sort by column)
-		Array.Sort(_body, (Coord a, Coord b) => {return a.x.CompareTo(b.x);});
+		Array.Sort(_body, (Cell a, Cell b) => {return a.x.CompareTo(b.x);});
 
-		Coord potentialBound = _body[0];
-		Coord current;
+		Cell potentialBound = _body[0];
+		Cell current;
 
 		for(int i=1; i<_body.Length; i++){
 
@@ -105,22 +107,22 @@ public class Polymino {
 		_lowerBounds.Add(potentialBound);
 
 		//sort array by y coordinate descending (so the bottommost point is the first) 
-		_lowerBounds.Sort((Coord a, Coord b) => {return -a.y.CompareTo(b.y);});
+		_lowerBounds.Sort((Cell a, Cell b) => {return -a.y.CompareTo(b.y);});
 
 		return Translate(_lowerBounds.ToArray());
 	}
 
-	public Coord[] GetRightBounds(){
+	public Cell[] GetRightBounds(){
 
 		//return cached
 		if(_rightBounds.Count > 0)
 			return Translate(_rightBounds.ToArray());
 
 		//sort array by y coordinate (sort by row)
-		Array.Sort(_body, (Coord a, Coord b) => {return a.y.CompareTo(b.y);});
+		Array.Sort(_body, (Cell a, Cell b) => {return a.y.CompareTo(b.y);});
 
-		Coord potentialBound = _body[0];
-		Coord current;
+		Cell potentialBound = _body[0];
+		Cell current;
 
 		for(int i=1; i<_body.Length; i++){
 
@@ -144,22 +146,22 @@ public class Polymino {
 		_rightBounds.Add(potentialBound);
 
 		//sort array by x coordinate descending (so the rightmost point is the first) 
-		_rightBounds.Sort((Coord a, Coord b) => {return -a.x.CompareTo(b.x);});
+		_rightBounds.Sort((Cell a, Cell b) => {return -a.x.CompareTo(b.x);});
 
 		return Translate(_rightBounds.ToArray());
 	}
 
-	public Coord[] GetLeftBounds(){
+	public Cell[] GetLeftBounds(){
 
 		//return cached
 		if(_leftBounds.Count > 0)
 			return Translate(_leftBounds.ToArray());
 
 		//sort array by y coordinate (sort by row)
-		Array.Sort(_body, (Coord a, Coord b) => {return a.y.CompareTo(b.y);});
+		Array.Sort(_body, (Cell a, Cell b) => {return a.y.CompareTo(b.y);});
 
-		Coord potentialBound = _body[0];
-		Coord current;
+		Cell potentialBound = _body[0];
+		Cell current;
 
 		for(int i=1; i<_body.Length; i++){
 
@@ -182,14 +184,14 @@ public class Polymino {
 		_leftBounds.Add(potentialBound);
 
 		//sort array by x coordinate ascending (so the leftmost point is the first) 
-		_leftBounds.Sort((Coord a, Coord b) => {return a.x.CompareTo(b.x);});
+		_leftBounds.Sort((Cell a, Cell b) => {return a.x.CompareTo(b.x);});
 
 		return Translate(_leftBounds.ToArray());
 	}
 		
 	//http://stackoverflow.com/questions/1457605/rotating-cordinates-around-pivot-tetris
 	//rotates the given coordinates by 90 degrees clockwise [O(n)]
-	private Coord[] Rotate90Clockwise(Coord[] coords){
+	private Cell[] Rotate90Clockwise(Cell[] coords){
 		int temp;
 		for(int i=0; i<coords.Length; i++){
 			temp = coords[i].x;
@@ -199,7 +201,7 @@ public class Polymino {
 		return coords;
 	}
 
-	private Coord[] Rotate90CounterClockwise(Coord[] coords){
+	private Cell[] Rotate90CounterClockwise(Cell[] coords){
 		int temp;
 		for(int i=0; i<coords.Length; i++){
 			temp = coords[i].x;
@@ -209,7 +211,7 @@ public class Polymino {
 		return coords;
 	}
 
-	private Coord[] Translate(Coord[] coords){
+	private Cell[] Translate(Cell[] coords){
 		for(int i=0; i<coords.Length; i++){
 			coords[i].x += Col;
 			coords[i].y += Row;
@@ -218,7 +220,7 @@ public class Polymino {
 	}
 
 	//calculates the size of the box containing the piece [O(n)]
-	private int GetMaxCoordinate(Coord[] coords){
+	private int GetMaxCoordinate(Cell[] coords){
 		int max = 0;
 		int greater;
 
