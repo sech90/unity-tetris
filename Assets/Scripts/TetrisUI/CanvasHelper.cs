@@ -13,6 +13,7 @@ public class CanvasHelper : MonoBehaviour {
 	[SerializeField] GameObject MainMenu;
 	[SerializeField] GameObject PauseMenu;
 	[SerializeField] GameObject GameOverPanel;
+	[SerializeField] Text ErrorText;
 	[SerializeField] Text ScoreText;
 	[SerializeField] Text GameOverScoreText;
 	[SerializeField] Text BestScoreText;
@@ -23,16 +24,32 @@ public class CanvasHelper : MonoBehaviour {
 	[SerializeField] InputField HeightField;
 
 	private int _latestScore = 0;
+	private GameManager _manager;
 
 	void Start(){
+		_manager = GameObject.FindObjectOfType<GameManager>();
 		ShowMenu();
+	}
+
+	public void ValidateInputAndStart(){
+		if(ReadHeight() < 4 || ReadWidth() < 4){
+			ErrorText.gameObject.SetActive(true);
+			ErrorText.text = "Minimum grid size is 4x4";
+		}
+		else
+			_manager.StartGame();
 	}
 
 	public void ShowMenu(){
 		MainMenu.SetActive(true);
 		PauseMenu.SetActive(false);
 		GameOverPanel.SetActive(false);
+
+		ErrorText.gameObject.SetActive(false);
 		BestScoreText.text = PlayerPrefs.GetInt("HighScore",0).ToString();
+		WidthField.text = PlayerPrefs.GetInt("Width",10).ToString();
+		HeightField.text = PlayerPrefs.GetInt("Height",20).ToString();
+		LevelSlider.value = PlayerPrefs.GetInt("Level",1);
 	}
 
 	public void ShowPause(){
@@ -65,15 +82,21 @@ public class CanvasHelper : MonoBehaviour {
 	}
 
 	public int ReadWidth(){
-		return int.Parse(WidthField.text); 
+		int w = int.Parse(WidthField.text); 
+		PlayerPrefs.SetInt("Width",w);
+		return w;
 	}
 
 	public int ReadHeight(){
-		return int.Parse(HeightField.text); 
+		int h = int.Parse(HeightField.text); 
+		PlayerPrefs.SetInt("Height",h);
+		return h;
 	}
 
 	public int ReadLevel(){
-		return (int)LevelSlider.value;
+		int level = (int)LevelSlider.value;
+		PlayerPrefs.SetInt("Level",level);
+		return level;
 	}
 
 	public void SetTimer(int min, int sec){
