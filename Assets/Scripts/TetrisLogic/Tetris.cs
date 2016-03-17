@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Collections;
 
+/// <summary>
+/// Facade to external user. Dispatches events and exposes APIs to interface with the game 
+/// </summary>
 public class Tetris : MonoBehaviour, ITetris {
 
 	public event SpawnHandler 		PieceSpawned;
@@ -14,7 +17,7 @@ public class Tetris : MonoBehaviour, ITetris {
 	[SerializeField] float MinInterval;
 	[SerializeField] float DropInterval;
 
-	public Grid Grid{get;private set;}
+	private Grid _grid;
 	public int Score {get; private set;}
 	public int Level {
 		get{return _level;}
@@ -28,7 +31,6 @@ public class Tetris : MonoBehaviour, ITetris {
 	private float _curInterval;
 	private float _timeWhenPaused;
 	private bool _gameOver = true;
-	private bool _fastDrop = false;
 	private bool _paused = false;
 
 
@@ -41,7 +43,7 @@ public class Tetris : MonoBehaviour, ITetris {
 	}
 
 	public void Initialize (int width, int height, int level){ 
-		Grid = new Grid(width, height);
+		_grid = new Grid(width, height);
 		Level = level;
 	}
 
@@ -68,41 +70,40 @@ public class Tetris : MonoBehaviour, ITetris {
 
 	public bool Rotate (){
 		//updating piece doesn't work after game over, while respawning or when operation is not possible
-		if(_gameOver || Grid.CurrentPiece == null || !Grid.Rotate())
+		if(_gameOver || _grid.CurrentPiece == null || !_grid.Rotate())
 			return false;
 
-		PieceUpdated(Grid.CurrentPiece);
+		PieceUpdated(_grid.CurrentPiece);
 		return true;
 	}
 
 	public bool Left (){
 		//updating piece doesn't work after game over, while respawning or when operation is not possible
-		if(_gameOver || Grid.CurrentPiece == null || !Grid.Left())
+		if(_gameOver || _grid.CurrentPiece == null || !_grid.Left())
 			return false;
 
-		PieceUpdated(Grid.CurrentPiece);
+		PieceUpdated(_grid.CurrentPiece);
 		return true;
 	}
 
 	public bool Right (){
 		//updating piece doesn't work after game over, while respawning or when operation is not possible
-		if(_gameOver || Grid.CurrentPiece == null || !Grid.Right())
+		if(_gameOver || _grid.CurrentPiece == null || !_grid.Right())
 			return false;
 
-		PieceUpdated(Grid.CurrentPiece);
+		PieceUpdated(_grid.CurrentPiece);
 		return true;
 	}
 
 	public void SetFastDrop (bool enable){
 
 		//fast drop doesn't work after game over or while respawning
-		if(_gameOver || Grid.CurrentPiece == null)
+		if(_gameOver || _grid.CurrentPiece == null)
 			return;
 
 		StopCoroutine(_mainLoop);
 
-		_fastDrop = enable;
-		_curInterval = enable ? DropInterval : GetIntervalTime();
+		_curInterval = enable ? DropInterval : GetIntervalTime(); 
 		_mainLoop = StartCoroutine(Loop());
 	}
 
@@ -127,9 +128,9 @@ public class Tetris : MonoBehaviour, ITetris {
 			}
 
 			//Grid has no active piece. Must spawn new piece
-			if(Grid.CurrentPiece == null){
+			if(_grid.CurrentPiece == null){
 				
-				bool ok = Grid.Spawn(_nextPiece);
+				bool ok = _grid.Spawn(_nextPiece);
 
 				//piece spawned correctly
 				if(ok){
@@ -149,15 +150,12 @@ public class Tetris : MonoBehaviour, ITetris {
 			else{
 
 				//step the piece down
-				List<int> clearedRows = Grid.Step();
+				List<int> clearedRows = _grid.Step();
 
 				//piece still on mid-air
 				if(clearedRows == null){
-					PieceUpdated(Grid.CurrentPiece);
+					PieceUpdated(_grid.CurrentPiece);
 
-					//grant one point for every fast dropped cell
-					if(_fastDrop)
-						UpdateScore(1);
 				}
 
 				//piece is landed
@@ -204,6 +202,8 @@ public class Tetris : MonoBehaviour, ITetris {
 		return Mathf.Lerp(MaxInterval, MinInterval, (float)(_level-1)/9.0f);
 	}
 
+	//this function could load the raw data from a file or some other source.
+	//it's possible to create all kind of shapes in this way. Here are only the standard piece.
 	private List<Polymino> LoadPolyminos(){
 		List<Polymino> pieces = new List<Polymino>();
 

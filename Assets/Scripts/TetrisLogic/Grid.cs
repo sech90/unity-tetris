@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// Logical representation of the tetris grid. It uses a 2D Array.
+/// </summary>
 public class Grid {
 
 	public int Width{get;private set;}

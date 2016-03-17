@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System;
 
+/// <summary>
+/// Logical representation of a tetris piece. It can support all sizes and shapes, that's why it's called Poly-mino.
+/// </summary>
 public class Polymino {
 
 	public enum PolyminoType{NONE, I, J, L, S, Z, T, O};
@@ -12,22 +15,27 @@ public class Polymino {
 	public PolyminoType Type{get;private set;}
 
 	public int Degrees{get; private set;}
+
+	//get a copy rotated by 90 degreed
 	public Polymino Rotated{
 		get{
 			Polymino rotation = Clone();
-
 			rotation.Rotate();
 			return rotation;
 		}
 	}
 
+	//some utility fields
 	public Cell BottomMost{get{return GetLowerBounds()[0];}}
 	public Cell LeftMost{get{return GetLeftBounds()[0];}}
 	public Cell RightMost{get{return GetRightBounds()[0];}}
 	public Cell[] Body{get{return GetBody();}}
 	public Cell[] OriginalBody{get{return (Cell[])_body.Clone();}}
 
+	//body is made up of cells. (0,0) is the top-left
 	private Cell[] _body;
+
+	//for caching
 	private List<Cell> _lowerBounds;
 	private List<Cell> _leftBounds; 
 	private List<Cell> _rightBounds;   
@@ -45,6 +53,8 @@ public class Polymino {
 		Type = type;
 		Row = row;
 		Col = col;
+
+		//how many blocks wide/tall? The polymino is always in a squared box
 		BoundSize = GetMaxCoordinate(_body) + 1;
 	}
 
@@ -73,7 +83,8 @@ public class Polymino {
 		_leftBounds.Clear();
 		_rightBounds.Clear();
 	}
-		
+
+	//TODO: bound-getter functions share the same logic. There should be only one function to deal with boundaries
 	public Cell[] GetLowerBounds(){
 
 		//return cached
@@ -201,6 +212,7 @@ public class Polymino {
 		return coords;
 	}
 
+	//similar to above
 	private Cell[] Rotate90CounterClockwise(Cell[] coords){
 		int temp;
 		for(int i=0; i<coords.Length; i++){
@@ -211,6 +223,7 @@ public class Polymino {
 		return coords;
 	}
 
+	//translate the cells by current Col and Row
 	private Cell[] Translate(Cell[] coords){
 		for(int i=0; i<coords.Length; i++){
 			coords[i].x += Col;

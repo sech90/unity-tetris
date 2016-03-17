@@ -3,9 +3,10 @@ using System.Collections;
 using UnityEngine.UI;
 using System;
 
+/// <summary>
+/// Main controller for the game. Controls the flow, the input and sets up events between logic ad UI
+/// </summary>
 public class GameManager : MonoBehaviour {
-
-
 
 	[Header("Audio references")]
 	[SerializeField] AudioClip MoveClip;
@@ -13,7 +14,6 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] AudioClip LandClip;
 	[SerializeField] AudioClip RowClearClip;
 	[SerializeField] AudioClip GameOverClip;
-	[SerializeField] AudioClip Music;
 
 	private ITetris _tetris;
 	private UIGrid _grid;
@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour {
 		_highScore  = PlayerPrefs.GetInt("HighScore",0);
 	}
 
+	//allows controlling the game with the keyboard
 	#if UNITY_EDITOR
 	void Update(){
 		if(_isPlaying && !_paused){
@@ -65,6 +66,32 @@ public class GameManager : MonoBehaviour {
 		_timerCoroutine = StartCoroutine(StartTimer());
 
 		_tetris.StartGame();
+	}
+
+	//called when there is a game over condition
+	public void OnGameOver(){
+		_audio.Stop();
+		_audio.PlayOneShot(GameOverClip);
+		_grid.GameOver();
+
+		_isPlaying = false;
+		StopCoroutine(_timerCoroutine);
+		Invoke("QuitGame",1.5f);
+	}
+
+	//called after GameOver or when player decides to leave the game
+	public void QuitGame(){
+
+		Clean();
+		UnRegisterListeners();
+
+		//update high score
+		if( _tetris.Score > _highScore){
+			_highScore = _tetris.Score;
+			PlayerPrefs.SetInt("HighScore",_highScore);
+		}
+
+		_canvas.ShowGameOver();
 	}
 
 	public void Left(){
@@ -107,18 +134,20 @@ public class GameManager : MonoBehaviour {
 
 		_paused = !_paused;
 	}
-
-	public void QuitGame(){
 		
-		if( _tetris.Score > _highScore){
-			_highScore = _tetris.Score;
-			PlayerPrefs.SetInt("HighScore",_highScore);
-		}
+	private void InitComponents(){
+		int w = _canvas.ReadWidth();
+		int h = _canvas.ReadHeight();
+		int l = _canvas.ReadLevel();
 
-		Clean();
-		UnRegisterListeners();
-		_canvas.ShowGameOver();
+		_grid.Clear();
+		_nextPiece.Clear();
 
+		_grid.Init(w,h);
+		_tetris.Initialize(w,h,l);
+		_canvas.ShowGame();
+		_audio.time = 0;
+		_audio.Play();
 	}
 
 	private void OnSpawn(Polymino current, Polymino next){
@@ -138,17 +167,7 @@ public class GameManager : MonoBehaviour {
 		else
 			_audio.PlayOneShot(LandClip);
 
-		/*TODO: show score popup in UI*/
-	}
-
-	public void OnGameOver(){
-		_audio.Stop();
-		_audio.PlayOneShot(GameOverClip);
-		_grid.GameOver();
-
-		_isPlaying = false;
-		StopCoroutine(_timerCoroutine);
-		Invoke("QuitGame",1.5f);
+		/*TODO: show how many points you got with the last move*/
 	}
 
 	private void ShowEndScreen(){
@@ -184,24 +203,6 @@ public class GameManager : MonoBehaviour {
 		_tetris.ScoreUpdated -= OnScore;
 	}
 		
-	private void InitComponents(){
-		int w = _canvas.ReadWidth();
-		int h = _canvas.ReadHeight();
-		int l = _canvas.ReadLevel();
-
-		_grid.Clear();
-		_nextPiece.Clear();
-
-		_grid.Init(w,h);
-		_tetris.Initialize(w,h,l);
-		_canvas.ShowGame();
-		_audio.time = 0;
-		_audio.Play();
-
-
-
-	}
-
 	private void Clean(){
 		_nextPiece.Clear();
 

@@ -2,7 +2,11 @@
 using System.Collections;
 using UnityEngine.UI;
 using System;
+using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Deals with menu, buttons and small UI related tasks
+/// </summary>
 public class CanvasHelper : MonoBehaviour {
 
 	[Header("UI references")]
@@ -49,6 +53,10 @@ public class CanvasHelper : MonoBehaviour {
 		PauseMenu.SetActive(false);
 		GameOverPanel.SetActive(true);
 		GameOverScoreText.text = _latestScore.ToString();
+	}
+
+	public void Reload(){
+		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 	}
 
 	public void ResetGameArea(){

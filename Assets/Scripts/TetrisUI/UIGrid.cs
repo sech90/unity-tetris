@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System;
 
+/// <summary>
+/// Tetris Grid. Can adapt to all grid sizes and adjust the bricks scale according to the parent dimensions.
+/// </summary>
 public class UIGrid : MonoBehaviour {
 
 	[SerializeField] float BrickFallSpeed = 10.0f;
@@ -30,7 +33,6 @@ public class UIGrid : MonoBehaviour {
 	public void Init(int width, int height){
 
 		_width = width;
-		//_height = height; 
 
 		//what's the bricks' size?
 		_unitSize = UIUtils.CalculateGridUnitSize(_bounds,width,height);
@@ -46,7 +48,7 @@ public class UIGrid : MonoBehaviour {
 		//float right 	= _bounds.center.x + (_unitSize * width/2.0f);
 
 		//place one unit in front of the parent (z)
-		_topLeft 	 = new Vector3(left,top,transform.position.z-_unitSize);
+		_topLeft = new Vector3(left,top,transform.position.z-_unitSize);
 	}
 		
 	public void Spawn(Polymino newPiece){
@@ -62,6 +64,7 @@ public class UIGrid : MonoBehaviour {
 		UpdateCurrent(newPiece);
 	}
 
+	//update the position of the falling bricks
 	public void UpdateCurrent(Polymino piece){
 		Vector3 pos = _topLeft;
 		pos.x += piece.Col * _unitSize;
@@ -100,6 +103,7 @@ public class UIGrid : MonoBehaviour {
 		}
 	}
 
+	//like it says
 	private void ExplodeRow(int y){
 		Cell cell = new Cell(0,y);
 		for(int i=0; i<_width; i++){
@@ -109,6 +113,7 @@ public class UIGrid : MonoBehaviour {
 		}
 	}
 
+	//TODO: find better implementation
 	private void MoveRow(int y, int jump){
 		Cell indexCell = new Cell(0,y);
 		UIBrick brick;
@@ -132,13 +137,14 @@ public class UIGrid : MonoBehaviour {
 		}
 	}
 
+	//At Gameover, turn all bricks to gray
 	public void GameOver(){
-
 		foreach(var kv in _landed){
-			kv.Value.Color = Color.gray;
+			kv.Value.GreyOut();
 		}
 	}
 		
+	//landed bricks must be mapped so we can access them later
 	private void MapBriks(Transform briksParent){
 		Transform brick;
 

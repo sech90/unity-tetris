@@ -2,6 +2,9 @@
 using System.Collections;
 using System;
 
+/// <summary>
+/// Provides useful functions expecially for handling the 3D bricks in the grid
+/// </summary>
 public class UIUtils {
 
 	private static UIUtils _instance;
@@ -15,10 +18,12 @@ public class UIUtils {
 
 	//will store a reference to the 3D brick model
 	private UIBrick BrickPrefab;
+	private Material cyan,blue,green,red,orange,purple,grey, yellow;
 
 	//by default assume that brick size is 1 unit
 	private float _unitSize = 1.0f;
 
+	//Creates a 3D polymino.
 	public static GameObject MakePolymino(Polymino piece){
 
 		//load 3D model if not loaded
@@ -41,19 +46,19 @@ public class UIUtils {
 		return polymino;
 	}
 
+	//reuse bricks and rearrange them according to the new placement
 	public static void RearrangeBricks(GameObject bricks, Polymino piece){
 
 		Cell[] body = piece.OriginalBody;
 
-		//create the bricks, assign color and position relative to parent
+		//rearrange the bricks
 		for(int i=0; i<body.Length; i++){
 			Transform brick = bricks.transform.GetChild(i);
 			brick.transform.localPosition = CellToLocalPosition(body[i]);
 		}
-			
-		//bricks.transform.GetChild(0).localRotation =  Quaternion.Euler(0,0,degrees);
 	}
 
+	//used for calculating the bricks scale
 	public static float CalculateGridUnitSize(Bounds bounds, int width, int height){
 		float hLength = bounds.size.x/width;
 		float vLength = bounds.size.y/height;
@@ -75,7 +80,7 @@ public class UIUtils {
 	//inverse operation of CoordToLocalPosition
 	public static Cell LocalPositionToCell(Vector3 pos){
 
-		//prevent stupid input
+		//prevent very unlikely case, but one never knows..
 		if(Instance._unitSize == 0)
 			throw new Exception("unitSize is 0. Preventing division by 0");
 
@@ -88,24 +93,41 @@ public class UIUtils {
 		return c;
 	}
 
-	public static Color GetPieceColor(Polymino.PolyminoType type){
+	//Shared materials are way more efficient than assigning separate colors to renderers
+	public static Material GetPieceMaterial(Polymino.PolyminoType type){
 		switch(type){
 		case Polymino.PolyminoType.I:
-			return Color.cyan;
+			if(Instance.cyan == null)
+				Instance.cyan = Resources.Load<Material>("Materials/cyan");
+			return Instance.cyan;
 		case Polymino.PolyminoType.J:
-			return Color.blue;
+			if(Instance.blue == null)
+				Instance.blue = Resources.Load<Material>("Materials/blue");
+			return Instance.blue;
 		case Polymino.PolyminoType.O:
-			return Color.yellow;
+			if(Instance.yellow == null)
+				Instance.yellow = Resources.Load<Material>("Materials/yellow");
+			return Instance.yellow;
 		case Polymino.PolyminoType.S:
-			return Color.green;
+			if(Instance.green == null)
+				Instance.green = Resources.Load<Material>("Materials/green");
+			return Instance.green;
 		case Polymino.PolyminoType.Z:
-			return Color.red;
+			if(Instance.red == null)
+				Instance.red = Resources.Load<Material>("Materials/red");
+			return Instance.red;
 		case Polymino.PolyminoType.T:
-			return new Color32(153, 0, 255,255); 	//purple
+			if(Instance.purple == null)
+				Instance.purple = Resources.Load<Material>("Materials/purple");
+			return Instance.purple;
 		case Polymino.PolyminoType.L:
-			return new Color32(255,102,0,255); 		//orange
+			if(Instance.orange == null)
+				Instance.orange = Resources.Load<Material>("Materials/orange");
+			return Instance.orange;
 		default:
-			return Color.gray;
+			if(Instance.grey == null)
+				Instance.grey = Resources.Load<Material>("Materials/grey");
+			return Instance.grey;
 		}
 	}
 
