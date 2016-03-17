@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class UIUtils {
 
@@ -13,19 +14,16 @@ public class UIUtils {
 	}
 
 	//will store a reference to the 3D brick model
-	private GameObject BrickPrefab;
+	private UIBrick BrickPrefab;
 
 	//by default assume that brick size is 1 unit
 	private float _unitSize = 1.0f;
 
-	public GameObject MakePolymino(Polymino piece){
+	public static GameObject MakePolymino(Polymino piece){
 
 		//load 3D model if not loaded
-		if(BrickPrefab == null)
-			BrickPrefab = LoadBrick();
-
-		//get color based on type
-		Color color = GetPieceColor(piece.Type);
+		if(Instance.BrickPrefab == null)
+			Instance.BrickPrefab = LoadBrick();
 
 		//create new container for the single bricks
 		GameObject polymino = new GameObject("Polymino"+piece.Type);
@@ -35,16 +33,28 @@ public class UIUtils {
 
 		//create the bricks, assign color and position relative to parent
 		for(int i=0; i<body.Length; i++){
-			GameObject block = GameObject.Instantiate<GameObject>(BrickPrefab);
-			block.transform.parent = polymino.transform;
-			block.transform.localPosition = CoordToLocalPosition(body[i]);
-			block.GetComponentInChildren<Renderer>().material.color = color;
+			UIBrick brick = GameObject.Instantiate<UIBrick>(Instance.BrickPrefab);
+			brick.transform.parent = polymino.transform;
+			brick.transform.localPosition = CellToLocalPosition(body[i]);
+			brick.Type = piece.Type;
 		}
-
 		return polymino;
 	}
 
-	public float CalculateGridUnitSize(Bounds bounds, int width, int height){
+	public static void RearrangeBricks(GameObject bricks, Polymino piece){
+
+		Cell[] body = piece.OriginalBody;
+
+		//create the bricks, assign color and position relative to parent
+		for(int i=0; i<body.Length; i++){
+			Transform brick = bricks.transform.GetChild(i);
+			brick.transform.localPosition = CellToLocalPosition(body[i]);
+		}
+			
+		//bricks.transform.GetChild(0).localRotation =  Quaternion.Euler(0,0,degrees);
+	}
+
+	public static float CalculateGridUnitSize(Bounds bounds, int width, int height){
 		float hLength = bounds.size.x/width;
 		float vLength = bounds.size.y/height;
 
@@ -52,17 +62,33 @@ public class UIUtils {
 	}
 
 	//Cell(x,y) will be Position(x,-y). Center will be the top-left corner
-	private Vector3 CoordToLocalPosition(Cell c){
-		float halfUnit = _unitSize/2;
+	public static Vector3 CellToLocalPosition(Cell c){
+		float halfUnit = Instance._unitSize/2;
 
 		return new Vector3(
-			(c.x * _unitSize) + halfUnit,
-			(-c.y * _unitSize) - halfUnit,
+			(c.x * Instance._unitSize) + halfUnit,
+			(-c.y * Instance._unitSize) - halfUnit,
 			0
 		);
 	}
 
-	public Color GetPieceColor(Polymino.PolyminoType type){
+	//inverse operation of CoordToLocalPosition
+	public static Cell LocalPositionToCell(Vector3 pos){
+
+		//prevent stupid input
+		if(Instance._unitSize == 0)
+			throw new Exception("unitSize is 0. Preventing division by 0");
+
+		float halfUnit = Instance._unitSize/2;
+		Cell c = new Cell();
+
+		c.x = (int)((pos.x - halfUnit)/Instance._unitSize);
+		c.y = (int)(-(pos.y + halfUnit)/Instance._unitSize);
+
+		return c;
+	}
+
+	public static Color GetPieceColor(Polymino.PolyminoType type){
 		switch(type){
 		case Polymino.PolyminoType.I:
 			return Color.cyan;
@@ -75,18 +101,18 @@ public class UIUtils {
 		case Polymino.PolyminoType.Z:
 			return Color.red;
 		case Polymino.PolyminoType.T:
-			return new Color32(153, 0, 255,1); 	//purple
+			return new Color32(153, 0, 255,255); 	//purple
 		case Polymino.PolyminoType.L:
-			return new Color32(255,102,0,1); 	//orange
+			return new Color32(255,102,0,255); 		//orange
 		default:
 			return Color.gray;
 		}
 	}
 
 	//load prefab and set unit size accordingly (assumes that scale is uniform for all axes)
-	private GameObject LoadBrick(){
-		GameObject obj = Resources.Load<GameObject>("Brick");
-		_unitSize = obj.transform.lossyScale.x;
+	private static UIBrick LoadBrick(){
+		UIBrick obj = Resources.Load<UIBrick>("Brick");
+		Instance._unitSize = obj.transform.lossyScale.x;
 		return obj;
 	}
 }

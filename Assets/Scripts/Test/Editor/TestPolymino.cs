@@ -45,6 +45,26 @@ public class TestPolymino {
 	}
 
 	[Test]
+	public void CellCloning() {
+		Cell c = new Cell(0,0);
+		Cell c1 = new Cell(0,0);
+		Cell c2 = c;
+
+		Assert.AreEqual(c,c1);
+		Assert.AreEqual(c,c2);
+		Assert.AreNotSame(c,c2);
+
+		Cell[] cells1 = new Cell[]{c,c1,c2};
+		Cell[] cells2 = (Cell[])cells1.Clone();
+
+		Assert.That(cells1, Is.EquivalentTo(cells2));
+		Assert.AreNotSame(cells1,cells2);
+
+		for(int i=0; i<cells1.Length;i++)
+			Assert.AreNotSame(cells1[i], cells2[i]);
+	}
+
+	[Test]
 	public void InitialPosition() {
 		foreach(Polymino p in All){
 			Assert.AreEqual(0,p.Col);

@@ -207,8 +207,8 @@ public class Tetris : MonoBehaviour, ITetris {
 	private List<Polymino> LoadPolyminos(){
 		List<Polymino> pieces = new List<Polymino>();
 
-		pieces.Add(new Polymino(new Cell[]{new Cell(0,1), new Cell(1,1), new Cell(2,1), new Cell(3,1)},Polymino.PolyminoType.I));
 		pieces.Add(new Polymino(new Cell[]{new Cell(0,1), new Cell(1,1), new Cell(2,1), new Cell(1,0)},Polymino.PolyminoType.T));
+		pieces.Add(new Polymino(new Cell[]{new Cell(0,1), new Cell(1,1), new Cell(2,1), new Cell(3,1)},Polymino.PolyminoType.I));
 		pieces.Add(new Polymino(new Cell[]{new Cell(0,1), new Cell(1,1), new Cell(2,1), new Cell(2,0)},Polymino.PolyminoType.L));
 		pieces.Add(new Polymino(new Cell[]{new Cell(0,1), new Cell(1,1), new Cell(2,1), new Cell(0,0)},Polymino.PolyminoType.J));
 		pieces.Add(new Polymino(new Cell[]{new Cell(0,1), new Cell(1,1), new Cell(1,0), new Cell(2,0)},Polymino.PolyminoType.S));

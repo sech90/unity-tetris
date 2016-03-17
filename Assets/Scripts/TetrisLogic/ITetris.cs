@@ -13,6 +13,7 @@ public interface ITetris {
 	event SpawnHandler 			PieceSpawned;
 	event UpdateHandler			PieceUpdated;
 	event PieceLandedHandler 	PieceLanded;
+	event ScoreUpdateHandler 	ScoreUpdated;
 	event GameOverHandler 		GameOver;
 
 	int Score{get;}

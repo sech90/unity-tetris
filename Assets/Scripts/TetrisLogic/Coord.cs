@@ -9,7 +9,7 @@ public struct Cell{
 		this.x = x;
 		this.y = y;
 	}
-
+		
 	public override string ToString (){
 		return string.Format ("[{0},{1}]",x,y);
 	}

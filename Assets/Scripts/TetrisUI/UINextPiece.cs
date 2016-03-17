@@ -7,12 +7,13 @@ public class UINextPiece : MonoBehaviour {
 	private float _unitSize;
 	private Vector3 _scale;
 	private Vector3 _position;
+	private GameObject _lastBricks;
 
 	void Start(){
 		_bounds =  GetComponent<Renderer>().bounds;
 
 		//for semplicity, suppose that polyminos fits in a 4x4 grid
-		_unitSize = UIUtils.Instance.CalculateGridUnitSize(_bounds,4,4);
+		_unitSize = UIUtils.CalculateGridUnitSize(_bounds,4,4);
 
 		//give 10% margin to all edges
 		_unitSize *= 0.8f;
@@ -23,8 +24,10 @@ public class UINextPiece : MonoBehaviour {
 		
 	public void ShowPolymino(Polymino piece){
 
+		Clear();
+
 		//get the bricks group
-		GameObject bricks = UIUtils.Instance.MakePolymino(piece);
+		GameObject bricks = UIUtils.MakePolymino(piece);
 
 		//set scale and position
 		bricks.transform.localScale = _scale;
@@ -32,6 +35,12 @@ public class UINextPiece : MonoBehaviour {
 
 		//center the bricks
 		bricks.transform.position = Centered(piece.BoundSize);
+		_lastBricks = bricks;
+	}
+
+	public void Clear(){
+		if(_lastBricks != null)
+			Destroy(_lastBricks);
 	}
 
 	private Vector3 Centered(int size){
